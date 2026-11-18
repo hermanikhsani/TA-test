@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "TurneringsAdmin · Dommer (mobil)",
+  "entry": "dommer-ta-mobil.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "primary": true,
+  "createdAt": "2026-11-11T10:33:32.735Z",
+  "updatedAt": "2026-11-12T12:22:32.492Z",
+  "designSystemId": "shadcn",
+  "metadata": {
+    "identifier": "dommer-ta-mobil",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}

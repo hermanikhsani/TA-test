@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "dommer-ta-mobil-landing-b.html",
+  "entry": "dommer-ta-mobil-landing-b.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-11-12T09:07:48.308Z",
+  "updatedAt": "2026-11-18T15:31:08.712Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

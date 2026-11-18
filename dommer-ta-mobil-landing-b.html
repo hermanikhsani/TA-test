@@ -1,0 +1,1693 @@
+<!doctype html>
+<html lang="nb" data-text="normal"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TurneringsAdmin · Dommer (landing B)</title>
+<style>
+/* ─── Design-system tokens — NIF Digital / TurneringsAdmin ──────────────
+   The only place raw colour values appear. Everything else is var()/color-mix(). */
+:root{
+  --bg:#f7faff;            /* Side-bakgrunn */
+  --surface:#ffffff;       /* Card surface */
+  --tone:#e6f0ff;          /* Bakgrunnstone */
+  --fg:#001e5f;            /* Primær Blå — tekst og struktur */
+  --fg-deep:#000d2e;       /* Hover / Primær Blå mørk */
+  --muted:#5c6b85;         /* Tekst, sekundær */
+  --border:#d3e0f5;        /* Border */
+  --accent:#0078ff;        /* Klar Blå — offisiell aksent */
+  --on-dark:#ffffff;       /* Tekst på mørk flate */
+  --success:#1f8f5c;       /* Grønn — bekreftet / fullført */
+  --danger:#c1443a;        /* Rød — avslag / forfall */
+  --warm:#b2792c;          /* Varm aksent — venter på andre, honorar */
+
+  /* derived — color-mix only */
+  --accent-ink:color-mix(in oklch, var(--accent) 78%, var(--fg-deep));
+  --accent-ink-hover:color-mix(in oklch, var(--accent) 58%, var(--fg-deep));
+  --accent-tint:color-mix(in oklch, var(--accent) 11%, var(--surface));
+  --success-ink:color-mix(in oklch, var(--success) 78%, var(--fg-deep));
+  --success-tint:color-mix(in oklch, var(--success) 11%, var(--surface));
+  --danger-ink:color-mix(in oklch, var(--danger) 78%, var(--fg-deep));
+  --danger-tint:color-mix(in oklch, var(--danger) 11%, var(--surface));
+  --warm-ink:color-mix(in oklch, var(--warm) 78%, var(--fg-deep));
+  --warm-tint:color-mix(in oklch, var(--warm) 11%, var(--surface));
+  --fg-tint:color-mix(in oklch, var(--fg) 5%, var(--surface));
+  --fg-line:color-mix(in oklch, var(--fg) 22%, var(--surface));
+  --hatch:color-mix(in oklch, var(--fg) 30%, var(--surface));
+  --scrim:color-mix(in oklch, var(--fg-deep) 46%, transparent);
+  --on-dark-quiet:color-mix(in oklch, var(--on-dark) 72%, var(--fg));
+  --sh-1:0 1px 2px color-mix(in oklch, var(--fg-deep) 8%, transparent);
+  --sh-2:0 18px 48px color-mix(in oklch, var(--fg-deep) 16%, transparent);
+  --sh-3:0 -10px 32px color-mix(in oklch, var(--fg-deep) 14%, transparent);
+
+  --font-display:"Inter","Inter Variable",system-ui,-apple-system,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-body:"Inter","Inter Variable",system-ui,-apple-system,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",SFMono-Regular,Consolas,"Liberation Mono",Menlo,Courier,monospace;
+
+  --r:8px; --r-lg:16px; --r-shell:32px;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px;
+}
+html{font-size:100%; -webkit-text-size-adjust:100%}
+html[data-text="large"]{font-size:118.75%}
+
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:var(--font-body); font-size:1rem; line-height:1.5;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+svg{display:block}
+/* hidden må slå enhver display-regel, ellers vises appbar, tabbar, ark og felt
+   som skrus av og på med elementets hidden-attributt. */
+[hidden]{display:none !important}
+button{font:inherit; color:inherit; cursor:pointer; background:none; border:0}
+a{color:var(--accent-ink); text-decoration:none}
+a:hover{text-decoration:underline}
+p{margin:0; text-wrap:pretty}
+h1,h2,h3,h4{margin:0; font-family:var(--font-display); text-wrap:balance; letter-spacing:-0.015em}
+ul{margin:0; padding:0; list-style:none}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:var(--r)}
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.num{font-family:var(--font-mono); font-variant-numeric:tabular-nums; letter-spacing:-0.01em}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0.01ms !important; animation-duration:0.01ms !important}}
+
+/* ─── stage + device shell ─────────────────────────────────────────── */
+.stage{min-height:100svh; display:grid; place-items:center; padding:var(--s6) var(--s4);
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--tone), transparent 62%),
+    var(--bg);
+}
+.phone{
+  position:relative; width:100%; max-width:430px; height:min(880px,92svh);
+  display:flex; flex-direction:column; overflow:hidden;
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:var(--r-shell); box-shadow:var(--sh-2);
+}
+.stage-note{display:none}
+@media (min-width:900px){
+  .stage{grid-template-columns:1fr auto; gap:var(--s8); align-items:center; justify-content:center; padding:var(--s8)}
+  .stage-note{display:block; max-width:34ch; order:-1; justify-self:end}
+  .stage-note h2{font-size:1.75rem; line-height:1.15; margin-bottom:var(--s4)}
+  .stage-note p{color:var(--muted); font-size:0.9375rem}
+  .stage-note .kicker{font-family:var(--font-mono); font-size:0.6875rem; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--accent-ink); margin-bottom:var(--s3)}
+  .stage-note ul{margin-top:var(--s5); display:grid; gap:var(--s3)}
+  .stage-note li{display:flex; gap:var(--s3); font-size:0.875rem; color:var(--muted); align-items:baseline}
+  .stage-note li b{color:var(--fg); font-weight:600}
+}
+@media (max-width:560px){
+  .stage{padding:0; display:block; background:var(--bg)}
+  .phone{max-width:none; height:100svh; border:0; border-radius:0; box-shadow:none}
+}
+
+/* ─── app bar ──────────────────────────────────────────────────────── */
+.appbar{
+  flex:0 0 auto; display:flex; align-items:center; gap:var(--s3);
+  padding:var(--s4) var(--s4) var(--s3);
+  background:color-mix(in oklch, var(--bg) 88%, transparent);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.appbar .wordmark{font-family:var(--font-display); font-weight:700; font-size:1rem; letter-spacing:-0.02em}
+.appbar .wordmark span{color:var(--muted); font-weight:500}
+.appbar h1{font-size:1.0625rem; font-weight:650; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.iconbtn{
+  flex:0 0 auto; width:44px; height:44px; display:grid; place-items:center;
+  border-radius:var(--r); border:1px solid transparent; position:relative;
+  transition:background 160ms cubic-bezier(.2,0,0,1), border-color 160ms;
+}
+.iconbtn svg{width:20px; height:20px; stroke:currentColor; stroke-width:1.7; fill:none;
+  stroke-linecap:round; stroke-linejoin:round}
+.iconbtn:hover{background:var(--tone); border-color:var(--border)}
+.badge{
+  position:absolute; top:6px; right:6px; min-width:18px; height:18px; padding:0 4px;
+  display:grid; place-items:center; border-radius:999px;
+  background:var(--accent-ink); color:var(--on-dark);
+  font-family:var(--font-mono); font-size:0.625rem; font-weight:600;
+}
+
+/* ─── screens ──────────────────────────────────────────────────────── */
+.screens{flex:1 1 auto; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch}
+.screen{display:none; padding:var(--s4) var(--s4) var(--s8)}
+.screen.is-active{display:block}
+.screen > * + *{margin-top:var(--s4)}
+.eyebrow{font-family:var(--font-mono); font-size:0.6875rem; letter-spacing:0.1em;
+  text-transform:uppercase; color:var(--muted)}
+.section-head{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s3)}
+.section-head h2{font-size:0.8125rem; font-family:var(--font-mono); letter-spacing:0.08em;
+  text-transform:uppercase; color:var(--muted); font-weight:500}
+.screen > .section-head{margin-top:var(--s6)}
+.screen > .section-head + *{margin-top:var(--s2)}
+
+/* ─── cards ────────────────────────────────────────────────────────── */
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  padding:var(--s4); box-shadow:var(--sh-1)}
+.card-alert{background:var(--fg); border-color:var(--fg); color:var(--on-dark); box-shadow:var(--sh-1)}
+.card-alert .muted,.card-alert .eyebrow{color:var(--on-dark-quiet)}
+.card-cta{display:block; width:100%; text-align:left; cursor:pointer; transition:transform 120ms, box-shadow 120ms}
+.card-cta:hover{box-shadow:var(--sh-2)}
+.card-cta:active{transform:scale(0.99)}
+.stat-row{display:grid; grid-template-columns:repeat(3, 1fr); gap:var(--s2)}
+.stat-tile{background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:var(--s3)}
+.stat-tile .stat-label{display:block; font-size:0.6875rem; font-family:var(--font-mono); letter-spacing:0.06em; color:var(--muted); text-transform:uppercase}
+.stat-tile .stat-value{display:block; font-size:1.0625rem; font-weight:650; margin-top:var(--s1)}
+.stat-tile .stat-sub{display:block; font-size:0.75rem; color:var(--muted); margin-top:2px}
+.card-quiet{background:var(--tone); border-color:var(--border); box-shadow:none}
+.muted{color:var(--muted)}
+.hr{border:0; border-top:1px solid var(--border); margin:var(--s4) 0}
+.card-alert .hr{border-top-color:color-mix(in oklch, var(--on-dark) 24%, transparent)}
+
+/* ─── buttons ──────────────────────────────────────────────────────── */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--s2);
+  min-height:44px; padding:var(--s3) var(--s5);
+  border-radius:var(--r); border:1px solid transparent;
+  font-size:0.9375rem; font-weight:600; letter-spacing:-0.005em; text-align:center;
+  transition:background 160ms cubic-bezier(.2,0,0,1), border-color 160ms, transform 60ms;
+}
+.btn:active{transform:translateY(1px)}
+.btn svg{width:18px; height:18px; stroke:currentColor; stroke-width:1.9; fill:none;
+  stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto}
+.btn-block{width:100%}
+.btn-primary{background:var(--accent-ink); color:var(--on-dark); border-color:var(--accent-ink)}
+.btn-primary:hover{background:var(--accent-ink-hover); border-color:var(--accent-ink-hover)}
+.btn-secondary{background:var(--surface); color:var(--fg); border-color:var(--border)}
+.btn-secondary:hover{background:var(--tone); border-color:var(--fg-line)}
+.btn-onnavy{background:var(--on-dark); color:var(--fg); border-color:var(--on-dark)}
+.btn-onnavy:hover{background:var(--tone); border-color:var(--tone)}
+.btn-ghost{background:transparent; color:var(--accent-ink); border-color:transparent; padding-inline:var(--s3)}
+.btn-ghost:hover{background:var(--accent-tint)}
+.btn-quiet{background:transparent; color:var(--fg); border-color:var(--border)}
+.btn-quiet:hover{background:var(--fg-tint); border-color:var(--fg-line)}
+.btn-sm{min-height:38px; padding:var(--s2) var(--s4); font-size:0.875rem}
+.btn[disabled]{opacity:0.45; cursor:not-allowed}
+.btn-row{display:flex; gap:var(--s2)}
+.btn-row > .btn{flex:1}
+
+/* ─── status chips: shape + glyph + word, never colour alone ───────── */
+.chip{display:inline-flex; align-items:center; gap:6px; padding:3px var(--s2);
+  border-radius:var(--r); border:1px solid var(--border); background:var(--surface);
+  font-size:0.75rem; font-weight:600; color:var(--fg); white-space:nowrap}
+.chip svg{width:13px; height:13px; stroke:currentColor; stroke-width:2.2; fill:none;
+  stroke-linecap:round; stroke-linejoin:round}
+.chip-confirmed{background:var(--fg); border-color:var(--fg); color:var(--on-dark)}
+.chip-action{background:var(--accent-tint); border-color:var(--accent); color:var(--accent-ink)}
+.chip-success{background:var(--success-tint); border-color:var(--success); color:var(--success-ink)}
+.chip-danger{background:var(--danger-tint); border-color:var(--danger); color:var(--danger-ink)}
+.chip-warm{background:var(--warm-tint); border-color:var(--warm); color:var(--warm-ink)}
+.chip-flat{background:var(--tone); border-color:var(--border); color:var(--muted)}
+.chip-outline{background:transparent; border-style:dashed; color:var(--muted)}
+.chip-mono{font-family:var(--font-mono); font-weight:500; letter-spacing:0.02em}
+
+/* ─── match row ────────────────────────────────────────────────────── */
+.mlist{display:grid; gap:var(--s2)}
+.mrow{
+  width:100%; display:grid; grid-template-columns:52px 1fr 18px; gap:var(--s3);
+  align-items:center; text-align:left;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r);
+  padding:var(--s3); box-shadow:var(--sh-1);
+  transition:border-color 160ms, background 160ms;
+}
+.mrow:hover{background:var(--tone); border-color:var(--fg-line)}
+.mrow .when{display:grid; justify-items:center; gap:1px; padding:var(--s2) 0;
+  background:var(--tone); border-radius:var(--r)}
+.mrow .when .d{font-family:var(--font-mono); font-size:1.0625rem; font-weight:600; line-height:1}
+.mrow .when .m{font-family:var(--font-mono); font-size:0.625rem; text-transform:uppercase;
+  letter-spacing:0.06em; color:var(--muted)}
+.mrow .body{min-width:0}
+.mrow .teams{font-weight:650; font-size:0.9375rem; line-height:1.3}
+.mrow .meta{font-size:0.8125rem; color:var(--muted); margin-top:2px;
+  display:flex; flex-wrap:wrap; gap:0 var(--s2)}
+.mrow .tags{margin-top:var(--s2); display:flex; flex-wrap:wrap; gap:var(--s1)}
+.mrow .warn{display:block; font-size:0.75rem; color:var(--muted); margin-top:var(--s2); line-height:1.4}
+.mrow .caret{width:18px; height:18px; stroke:var(--muted); stroke-width:1.8; fill:none;
+  stroke-linecap:round; stroke-linejoin:round}
+.mrow:hover .caret{stroke:var(--fg)}
+.mrow.is-urgent{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), var(--sh-1)}
+.mrow.is-urgent:hover{background:var(--accent-tint); border-color:var(--accent)}
+.mrow.is-urgent .when{background:var(--accent-ink); color:var(--on-dark)}
+.mrow.is-urgent .when .m{color:var(--on-dark-quiet)}
+.mrow.is-urgent .teams{font-weight:700}
+.mrow.is-urgent .caret{stroke:var(--accent-ink)}
+.mrow.is-urgent:hover .caret{stroke:var(--accent-ink)}
+
+/* ─── segmented control ────────────────────────────────────────────── */
+.segmented{display:flex; gap:2px; padding:3px; background:var(--tone);
+  border:1px solid var(--border); border-radius:var(--r)}
+.segmented button{
+  flex:1; min-height:38px; border-radius:6px; font-size:0.875rem; font-weight:600;
+  color:var(--muted); transition:background 160ms, color 160ms;
+}
+.segmented button:hover{background:color-mix(in oklch, var(--surface) 70%, var(--tone)); color:var(--fg)}
+.segmented button[aria-selected="true"]{background:var(--surface); color:var(--fg); box-shadow:var(--sh-1)}
+#cal-tabs{flex:1}
+
+/* ─── action queue ─────────────────────────────────────────────────── */
+.queue{display:grid; gap:var(--s2)}
+.qrow{width:100%; display:grid; grid-template-columns:34px 1fr auto; gap:var(--s3); align-items:center;
+  text-align:left; padding:var(--s3); border:1px solid var(--border); border-radius:var(--r);
+  background:var(--surface); box-shadow:var(--sh-1); transition:background 160ms, border-color 160ms}
+.qrow:hover{background:var(--tone); border-color:var(--fg-line)}
+.qrow .qmark{width:34px; height:34px; display:grid; place-items:center; border-radius:var(--r);
+  background:var(--tone); color:var(--fg)}
+.qrow .qmark svg{width:17px; height:17px; stroke:currentColor; stroke-width:1.8; fill:none;
+  stroke-linecap:round; stroke-linejoin:round}
+.qrow.is-priority .qmark{background:var(--accent-ink); color:var(--on-dark)}
+.qrow.is-warm .qmark{background:var(--warm-tint); color:var(--warm-ink)}
+.qrow .qt{font-weight:600; font-size:0.9375rem; line-height:1.3}
+.qrow .qs{font-size:0.8125rem; color:var(--muted)}
+.qrow .qn{font-family:var(--font-mono); font-size:0.8125rem; color:var(--muted)}
+
+/* ─── calendar ─────────────────────────────────────────────────────── */
+.calhead{display:flex; align-items:center; justify-content:space-between; gap:var(--s2)}
+.calhead .mon{font-size:1.0625rem; font-weight:650; letter-spacing:-0.01em}
+.caldow{display:grid; grid-template-columns:repeat(7,1fr); gap:var(--s1); margin-top:var(--s3)}
+.caldow span{text-align:center; font-family:var(--font-mono); font-size:0.625rem;
+  letter-spacing:0.06em; text-transform:uppercase; color:var(--muted)}
+.calgrid{display:grid; grid-template-columns:repeat(7,1fr); gap:var(--s1); margin-top:var(--s1)}
+.day{
+  position:relative; aspect-ratio:1/1; min-height:44px; display:grid; place-items:center;
+  border-radius:var(--r); border:1px solid transparent; background:var(--surface);
+  transition:border-color 160ms, background 160ms;
+}
+.day:hover{background:var(--tone); border-color:var(--fg-line)}
+.day .dn{font-family:var(--font-mono); font-size:0.9375rem; font-weight:500; line-height:1;
+  margin-bottom:9px}
+.day.is-out{background:transparent; color:var(--muted); opacity:0.5}
+.day.is-out:hover{background:var(--fg-tint)}
+.day.is-today{border-color:var(--fg)}
+.day.is-today .dn{font-weight:700}
+.day.is-blocked{
+  background:
+    repeating-linear-gradient(135deg, var(--hatch) 0 1.5px, transparent 1.5px 6px),
+    var(--surface);
+  border-color:var(--fg-line);
+}
+.day.is-selected{border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
+.day .marks{position:absolute; bottom:6px; left:0; right:0; display:flex; justify-content:center;
+  gap:3px; height:6px; align-items:center}
+.mk-match{width:6px; height:6px; border-radius:999px; background:var(--fg)}
+.mk-block{width:12px; height:4px; border-radius:2px;
+  background:repeating-linear-gradient(135deg, var(--fg) 0 1.5px, transparent 1.5px 4px), var(--fg-line)}
+.legend{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s4); margin-top:var(--s4);
+  padding-top:var(--s3); border-top:1px solid var(--border)}
+.legend li{display:flex; align-items:center; gap:6px; font-size:0.8125rem; color:var(--muted)}
+.legend .swatch{width:18px; height:18px; border-radius:5px; border:1px solid var(--border);
+  background:var(--surface); display:grid; place-items:center}
+.legend .swatch.sw-block{background:
+  repeating-linear-gradient(135deg, var(--hatch) 0 1.5px, transparent 1.5px 6px), var(--surface);
+  border-color:var(--fg-line)}
+.legend .swatch.sw-today{border-color:var(--fg); border-width:1px; box-shadow:inset 0 0 0 1px var(--fg)}
+
+/* ─── block list ───────────────────────────────────────────────────── */
+.blist{display:grid; gap:var(--s2)}
+.brow{display:grid; grid-template-columns:1fr auto; gap:var(--s3); align-items:center;
+  padding:var(--s3); border:1px solid var(--border); border-radius:var(--r); background:var(--surface)}
+.brow .bt{font-weight:600; font-size:0.875rem}
+.brow .bs{display:inline-block; margin-top:3px; font-size:0.8125rem; color:var(--muted); font-family:var(--font-mono)}
+.linkbtn{min-height:44px; padding:0 var(--s2); font-size:0.875rem; font-weight:600;
+  color:var(--accent-ink); border-radius:var(--r)}
+.linkbtn:hover{background:var(--accent-tint)}
+.empty{padding:var(--s5); text-align:center; color:var(--muted); font-size:0.875rem;
+  border:1px dashed var(--border); border-radius:var(--r)}
+
+/* ─── detail / data rows ───────────────────────────────────────────── */
+.drow{display:grid; grid-template-columns:104px 1fr; gap:var(--s3); padding:var(--s3) 0;
+  border-top:1px solid var(--border); align-items:baseline}
+.drow:first-child{border-top:0; padding-top:0}
+.drow dt{font-size:0.8125rem; color:var(--muted)}
+.drow dd{margin:0; font-size:0.9375rem; font-weight:500}
+.drow dd .sub{display:block; font-size:0.8125rem; color:var(--muted); font-weight:400; margin-top:1px}
+
+/* ─── forms ────────────────────────────────────────────────────────── */
+.field{display:grid; gap:6px}
+.field > label{font-size:0.8125rem; color:var(--muted)}
+.input{width:100%; min-height:44px; padding:var(--s3); border:1px solid var(--border);
+  border-radius:var(--r); background:var(--surface); color:var(--fg); font:inherit; font-size:0.9375rem}
+.input:hover{border-color:var(--fg-line)}
+.input:focus-visible{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent)}
+textarea.input{min-height:80px; resize:vertical; line-height:1.5}
+.radiolist{display:grid; gap:var(--s2)}
+.radioitem{display:grid; grid-template-columns:20px 1fr; gap:var(--s3); align-items:start;
+  padding:var(--s3); border:1px solid var(--border); border-radius:var(--r);
+  background:var(--surface); cursor:pointer; transition:border-color 160ms, background 160ms}
+.radioitem:hover{background:var(--tone); border-color:var(--fg-line)}
+.radioitem:has(input:checked){border-color:var(--accent); background:var(--accent-tint)}
+.radioitem:has(input:focus-visible){outline:2px solid var(--accent); outline-offset:2px}
+.radioitem input{width:20px; height:20px; margin:1px 0 0; accent-color:var(--accent-ink)}
+.radioitem .rt{font-weight:600; font-size:0.9375rem; line-height:1.3}
+.radioitem .rs{font-size:0.8125rem; color:var(--muted)}
+.timepair{display:grid; grid-template-columns:1fr 1fr; gap:var(--s3); margin-top:var(--s3)}
+.srow{display:grid; grid-template-columns:1fr 46px; gap:var(--s3); align-items:center;
+  padding:var(--s3) 0; border-top:1px solid var(--border)}
+.srow:first-child{border-top:0}
+.srow .st{font-size:0.9375rem; font-weight:500}
+.srow .ss{font-size:0.8125rem; color:var(--muted)}
+.switch{position:relative; width:46px; height:28px; flex:0 0 auto}
+.switch input{position:absolute; inset:0; opacity:0; margin:0; width:100%; height:100%; cursor:pointer}
+.switch .track{position:absolute; inset:0; border-radius:999px; background:var(--tone);
+  border:1px solid var(--border); transition:background 160ms, border-color 160ms}
+.switch .knob{position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:999px;
+  background:var(--surface); box-shadow:var(--sh-1); border:1px solid var(--border);
+  transition:transform 160ms cubic-bezier(.2,0,0,1)}
+.switch input:checked ~ .track{background:var(--accent-ink); border-color:var(--accent-ink)}
+.switch input:checked ~ .knob{transform:translateX(18px); border-color:var(--accent-ink)}
+.switch input:focus-visible ~ .track{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ─── nav drawer ───────────────────────────────────────────────────── */
+.drawer{
+  position:absolute; top:0; bottom:0; left:0; z-index:50;
+  width:min(80%, 300px); display:flex; flex-direction:column;
+  background:var(--surface); border-right:1px solid var(--border);
+  box-shadow:var(--sh-2); padding-top:env(safe-area-inset-top);
+  transform:translateX(-100%); transition:transform 240ms cubic-bezier(.2,0,0,1);
+}
+.drawer.is-open{transform:translateX(0)}
+.drawer-head{flex:0 0 auto; display:flex; align-items:center; gap:var(--s3);
+  padding:var(--s5) var(--s4) var(--s4); border-bottom:1px solid var(--border)}
+.drawer-head .av{width:40px; height:40px; flex:0 0 auto; border-radius:var(--r);
+  background:var(--fg); color:var(--on-dark); display:grid; place-items:center;
+  font-family:var(--font-mono); font-size:0.9375rem; font-weight:600}
+.drawer-head .id{min-width:0}
+.drawer-head .id .nm{font-weight:650; font-size:0.9375rem; line-height:1.3;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.drawer-head .id .rl{font-size:0.8125rem; color:var(--muted);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.drawer-nav{flex:1 1 auto; overflow-y:auto; padding:var(--s3); display:grid; grid-auto-rows:min-content; align-content:start; gap:2px}
+.drawer-nav button{
+  width:100%; min-height:80px; display:flex; align-items:center; gap:var(--s3);
+  padding:0 var(--s3); border-radius:var(--r); color:var(--fg);
+  font-size:0.9375rem; font-weight:600; transition:background 160ms, color 160ms;
+}
+.drawer-nav button svg{width:20px; height:20px; stroke:currentColor; stroke-width:1.7;
+  fill:none; stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto}
+.drawer-nav button:hover{background:var(--tone)}
+.drawer-nav button[aria-current="page"]{background:var(--accent-tint); color:var(--accent-ink)}
+.drawer-dot{margin-left:auto; width:8px; height:8px; border-radius:999px; background:var(--accent-ink)}
+.drawer-foot{flex:0 0 auto; padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border)}
+
+/* ─── sheet ────────────────────────────────────────────────────────── */
+.scrim{position:absolute; inset:0; background:var(--scrim); opacity:0; pointer-events:none;
+  transition:opacity 200ms ease; z-index:40}
+.scrim.is-open{opacity:1; pointer-events:auto}
+.sheet{position:absolute; left:0; right:0; bottom:0; z-index:50;
+  max-height:88%; display:flex; flex-direction:column;
+  background:var(--surface); border-top:1px solid var(--border);
+  border-radius:var(--r-lg) var(--r-lg) 0 0; box-shadow:var(--sh-3);
+  transform:translateY(100%); transition:transform 240ms cubic-bezier(.2,0,0,1)}
+.sheet.is-open{transform:translateY(0)}
+.sheet-head{flex:0 0 auto; display:flex; align-items:center; gap:var(--s3);
+  padding:var(--s4) var(--s4) var(--s3); border-bottom:1px solid var(--border)}
+.sheet-head h2{flex:1; font-size:1.0625rem; font-weight:650}
+.sheet-body{flex:1 1 auto; overflow-y:auto; padding:var(--s4); display:grid; gap:var(--s4)}
+.sheet-foot{flex:0 0 auto; padding:var(--s3) var(--s4) var(--s4); border-top:1px solid var(--border);
+  display:grid; gap:var(--s2)}
+.grabber{width:36px; height:4px; border-radius:2px; background:var(--border);
+  margin:var(--s2) auto 0}
+
+/* ─── toast ────────────────────────────────────────────────────────── */
+.toast{position:absolute; left:var(--s4); right:var(--s4); bottom:76px; z-index:60;
+  display:flex; align-items:flex-start; gap:var(--s3);
+  padding:var(--s3) var(--s4); border-radius:var(--r);
+  background:var(--fg); color:var(--on-dark); box-shadow:var(--sh-2);
+  font-size:0.875rem; opacity:0; transform:translateY(10px); pointer-events:none;
+  transition:opacity 200ms ease, transform 200ms cubic-bezier(.2,0,0,1)}
+.toast.is-open{opacity:1; transform:translateY(0)}
+.toast svg{width:18px; height:18px; stroke:currentColor; stroke-width:2; fill:none;
+  stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto; margin-top:1px}
+
+.sourcenote{display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono);
+  font-size:0.6875rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--muted)}
+.sourcenote::before{content:""; width:5px; height:5px; border-radius:999px; background:var(--muted)}
+
+/* ─── misc ─────────────────────────────────────────────────────────── */
+.kv{display:flex; flex-wrap:wrap; gap:var(--s2)}
+.bigclock{font-family:var(--font-mono); font-size:2rem; font-weight:600; line-height:1;
+  letter-spacing:-0.03em}
+.total{display:flex; align-items:center; justify-content:space-between; gap:var(--s3);
+  padding:var(--s3) var(--s4); border-radius:var(--r); background:var(--fg); color:var(--on-dark)}
+.total .tl{font-size:0.875rem; color:var(--on-dark-quiet)}
+.total .tv{font-family:var(--font-mono); font-size:1.125rem; font-weight:600}
+.pick{display:grid; grid-template-columns:22px 1fr auto; gap:var(--s3); align-items:center;
+  padding:var(--s3); border:1px solid var(--border); border-radius:var(--r);
+  background:var(--surface); cursor:pointer}
+.pick:hover{background:var(--tone); border-color:var(--fg-line)}
+.pick:has(input:checked){border-color:var(--accent); background:var(--accent-tint)}
+.pick:has(input:focus-visible){outline:2px solid var(--accent); outline-offset:2px}
+.pick input{width:22px; height:22px; margin:0; accent-color:var(--accent-ink)}
+.pick .pt{font-weight:600; font-size:0.9375rem; line-height:1.3; display:block}
+.pick .ps{font-size:0.8125rem; color:var(--muted); display:block; margin-top:2px}
+.pick .pv{font-family:var(--font-mono); font-size:0.9375rem; font-weight:600}
+.pick .pright{display:flex; flex-direction:column; align-items:flex-end; gap:4px}
+.notif{display:grid; grid-template-columns:8px 1fr; gap:var(--s3); padding:var(--s3) 0;
+  border-top:1px solid var(--border); align-items:start}
+.notif:first-child{border-top:0; padding-top:0}
+.notif .dot{width:8px; height:8px; border-radius:999px; background:var(--accent-ink); margin-top:7px}
+.notif.is-read .dot{background:var(--border)}
+.notif .nt{font-size:0.9375rem; font-weight:600; line-height:1.35}
+.notif .ns{font-size:0.8125rem; color:var(--muted)}
+.notif .nd{font-family:var(--font-mono); font-size:0.6875rem; color:var(--muted);
+  text-transform:uppercase; letter-spacing:0.05em; margin-top:3px}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  
+
+  <div class="phone" role="application" aria-label="TurneringsAdmin for dommere">
+
+    <!-- ══ APP ════════════════════════════════════════════════════════ -->
+    <header class="appbar" id="appbar" data-od-id="appbar">
+      <button class="iconbtn" id="menu-btn" aria-label="Meny" aria-expanded="false" aria-controls="drawer" data-od-id="btn-meny">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      </button>
+      <button class="iconbtn" id="back-btn" hidden="" aria-label="Tilbake">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+      </button>
+      <h1 id="appbar-title">Din kalender</h1>
+      <button class="iconbtn" id="bell-btn" aria-label="Varsler, 3 nye" data-od-id="btn-varsler">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15V10a6 6 0 1 0-12 0v5l-1.5 2.5h15L18 15z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>
+        <span class="badge num" aria-hidden="true">2</span>
+      </button>
+    </header>
+
+    <div class="screens" id="screens">
+
+      <!-- ── HJEM ──────────────────────────────────────────────────── -->
+      <section class="screen is-active" id="s-home" data-od-id="screen-hjem" aria-label="Oversikt">
+
+        
+
+        <button class="card card-alert card-cta" id="q-answer" data-od-id="queue-svar-oppdrag">
+          <p class="eyebrow" style="display:flex; align-items:center; gap:6px"><span aria-hidden="true" style="width:7px; height:7px; border-radius:999px; background:var(--danger); flex:0 0 auto"></span>Krever svar · frist i dag 20:00</p>
+          <h2 style="font-size:1.1875rem; line-height:1.25; margin-top:var(--s2)">Fjellhammer – Oppsal</h2>
+          <p class="muted" style="font-size:0.875rem; margin-top:var(--s1)">Lørdag 28. november · 2. divisjon Menn · Nordre Åsen-hallen</p>
+          <div class="btn-row" style="margin-top:var(--s4)">
+            <span class="btn btn-onnavy btn-sm" aria-hidden="true">Svar på oppdraget</span>
+          </div>
+        </button>
+
+        <div class="section-head">
+          <h2>Dine oppgaver: <span id="queue-count" class="num"></span></h2>
+        </div>
+        <div class="queue" data-od-id="queue-handling">
+          <button class="qrow is-warm" id="queue-honorar" data-go="s-invoice" data-od-id="queue-honorar">
+            <span class="qmark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"></path><path d="M9 8h6M9 12h6"></path></svg></span>
+            <span>
+              <span class="qt" id="queue-honorar-text">5 oppdrag klare for idrettsoppgjør</span>
+              <span class="qs">Send inn før den 20. for utbetaling denne måneden</span>
+            </span>
+            <span class="qn" id="queue-honorar-amount">1 400 kr</span>
+          </button>
+          <button class="qrow" data-old-ta="m-kfum" data-od-id="queue-observasjonsskjema">
+            <span class="qmark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></span>
+            <span>
+              <span class="qt">Du har fått et nytt Observasjonsskjema</span> 
+              <span class="qs">Vålerenga – Linderud/Linje 5</span>
+            </span>
+            <svg class="caret" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;stroke:var(--muted);stroke-width:1.8;fill:none"><path d="M9 5l7 7-7 7"></path></svg>
+          </button>
+          <button class="qrow" data-old-ta="m-kfum" data-od-id="queue-disiplinaerrapport">
+            <span class="qmark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.3 3.9L2.5 17a1.7 1.7 0 0 0 1.5 2.5h16a1.7 1.7 0 0 0 1.5-2.5L13.7 3.9a1.7 1.7 0 0 0-3.4 0z"></path></svg></span>
+            <span>
+              <span class="qt">Bekreft disiplinærrapport</span> <br>
+              <span class="qs">Vålerenga – Linderud/Linje 5</span>
+            </span>
+            <svg class="caret" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;stroke:var(--muted);stroke-width:1.8;fill:none"><path d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
+
+        <div class="section-head">
+          <h2>Din kalender</h2>
+          <button class="linkbtn" data-go="s-cal">Åpne kalenderen</button>
+        </div>
+        <article class="card" data-od-id="card-kalender-hjem">
+          <div class="calhead">
+            <button class="iconbtn" id="home-cal-prev" aria-label="Forrige måned">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+            </button>
+            <span class="mon" id="home-cal-month" aria-live="polite">—</span>
+            <button class="iconbtn" id="home-cal-next" aria-label="Neste måned">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+            </button>
+          </div>
+          <div class="caldow" aria-hidden="true">
+            <span>Ma</span><span>Ti</span><span>On</span><span>To</span><span>Fr</span><span>Lø</span><span>Sø</span>
+          </div>
+          <div class="calgrid" id="home-cal-grid" role="grid" aria-label="Kalender for tilgjengelighet"></div>
+          <ul class="legend">
+            <li><span class="swatch" aria-hidden="true"></span> Ledig</li>
+            <li><span class="swatch sw-block" aria-hidden="true"></span> Sperret</li>
+            <li><span class="swatch" aria-hidden="true"><span class="mk-match"></span></span> Har kamp</li>
+            <li><span class="swatch sw-today" aria-hidden="true"></span> I dag</li>
+          </ul>
+        </article>
+
+        <div class="section-head">
+          <h2>Kampene mine</h2>
+          <button class="linkbtn" data-go="s-matches">Se alle</button>
+        </div>
+        <div class="mlist" id="home-matches"></div>
+
+      </section>
+
+      <!-- ── KAMPER ────────────────────────────────────────────────── -->
+      <section class="screen" id="s-matches" data-od-id="screen-kamper" aria-label="Kamper">
+        <div class="segmented" role="tablist" aria-label="Filtrer kamper">
+          <button role="tab" aria-selected="true" data-filter="upcoming" id="tab-upcoming">Kommende</button>
+          <button role="tab" aria-selected="false" data-filter="open" id="tab-open">Ledige</button>
+          <button role="tab" aria-selected="false" data-filter="done" id="tab-done">Fullførte</button>
+        </div>
+        <p class="muted" style="font-size:0.875rem; margin-top:var(--s2)" id="matches-hint"></p>
+        <div class="mlist" id="match-list"></div>
+      </section>
+
+      <!-- ── KAMPINFO ──────────────────────────────────────────────── -->
+      <section class="screen" id="s-match" data-od-id="screen-kampinfo" aria-label="Kampinfo">
+        <article class="card" data-od-id="card-kampinfo-topp">
+          <div class="kv" id="md-chips"></div>
+          <h2 style="font-size:1.25rem; line-height:1.25; margin-top:var(--s3)" id="md-teams">—</h2>
+          <p class="muted" style="font-size:0.875rem; margin-top:var(--s1)" id="md-comp">2. Divisjon menn</p>
+          <hr class="hr">
+          <dl style="margin:0">
+            <div class="drow"><dt>Tid</dt><dd id="md-time">—</dd></div>
+            <div class="drow"><dt>Anlegg</dt><dd id="md-venue">—</dd></div>
+            <div class="drow"><dt>Din rolle</dt><dd id="md-role">—</dd></div>
+            <div class="drow"><dt>Dommerteam</dt><dd id="md-team">—</dd></div>
+            <div class="drow"><dt>Sekretariat + tidtaker</dt><dd id="md-secretariat">—</dd></div>
+            <div class="drow"><dt>Honorar</dt><dd id="md-fee">350</dd></div>
+            <div class="drow"><dt>Kontakt</dt><dd id="md-contact">—</dd></div>
+          </dl>
+        </article>
+        <div id="md-actions" style="display:grid; gap:var(--s2)"></div>
+        <p class="muted" style="font-size:0.8125rem" id="md-note">Helpertext</p>
+      </section>
+
+      <!-- ── TILGJENGELIGHET ───────────────────────────────────────── -->
+      <section class="screen" id="s-cal" data-od-id="screen-tilgjengelighet" aria-label="Tilgjengelighet">
+        <div>
+          <h2 style="font-size:1.25rem">Når kan du dømme?</h2>
+          <p class="muted" style="font-size:0.9375rem; margin-top:var(--s2)">Trykk på en dag for å si fra når du <em>ikke</em> kan. Alt du ikke sperrer regnes som ledig.</p>
+          <p class="muted" style="font-size:0.8125rem; margin-top:var(--s1)">Spiller du kamp selv for <strong>Bækkelaget</strong>, sperres dagen automatisk for dommeroppdrag.</p>
+        </div>
+
+        <article class="card" data-od-id="card-kalender">
+          <div class="calhead">
+            <button class="iconbtn" id="cal-prev" aria-label="Forrige måned">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+            </button>
+            <span class="mon" id="cal-month" aria-live="polite">—</span>
+            <button class="iconbtn" id="cal-next" aria-label="Neste måned">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+            </button>
+          </div>
+          <div class="caldow" aria-hidden="true">
+            <span>Ma</span><span>Ti</span><span>On</span><span>To</span><span>Fr</span><span>Lø</span><span>Sø</span>
+          </div>
+          <div class="calgrid" id="cal-grid" role="grid" aria-label="Kalender for tilgjengelighet"></div>
+          <ul class="legend">
+            <li><span class="swatch" aria-hidden="true"></span> Ledig</li>
+            <li><span class="swatch sw-block" aria-hidden="true"></span> Sperret</li>
+            <li><span class="swatch" aria-hidden="true"><span class="mk-match"></span></span> Har kamp</li>
+            <li><span class="swatch sw-today" aria-hidden="true"></span> I dag</li>
+          </ul>
+        </article>
+
+        <div class="section-head" style="align-items:center">
+          <div class="segmented" role="tablist" aria-label="Vis kommende kamper, sperrer eller reservasjoner" id="cal-tabs">
+            <button role="tab" aria-selected="true" data-view="matches" id="cal-tab-matches">Kommende</button>
+            <button role="tab" aria-selected="false" data-view="blocks" id="cal-tab-blocks">Sperrene dine</button>
+            <button role="tab" aria-selected="false" data-view="reservations" id="cal-tab-reservations">Mine reservasjoner</button>
+          </div>
+          <span class="chip chip-flat chip-mono" id="cal-count"></span>
+        </div>
+        <div class="mlist" id="cal-match-list"></div>
+        <div class="blist" id="block-list" hidden=""></div>
+        <div id="reservation-panel" hidden="">
+          <div class="blist" id="reservation-list"></div>
+          <button class="btn btn-ghost btn-block" id="reservation-add" style="margin-top:var(--s3)" data-od-id="cta-legg-til-reservasjon">+ Legg til reservasjon</button>
+        </div>
+      </section>
+
+      <!-- ── PROFIL ────────────────────────────────────────────────── -->
+      <section class="screen" id="s-profile" data-od-id="screen-profil" aria-label="Min profil">
+        <article class="card" data-od-id="card-profil-identitet">
+          <div style="display:flex; align-items:center; gap:var(--s4)">
+            <span aria-hidden="true" style="width:56px;height:56px;flex:0 0 auto;border-radius:var(--r);background:var(--fg);color:var(--on-dark);display:grid;place-items:center;font-family:var(--font-mono);font-size:1.125rem;font-weight:600">MH</span>
+            <div style="min-width:0">
+              <h2 style="font-size:1.125rem">Marte Halvorsen</h2>
+              <p class="muted" style="font-size:0.875rem">Dommer · Håndball</p>
+            </div>
+          </div>
+          <hr class="hr">
+          
+          <dl style="margin:0">
+            <div class="drow"><dt>Født</dt><dd class="num">14.03.1996</dd></div>
+            <div class="drow"><dt>Pin-kode</dt><dd class="num">4721</dd></div>
+          </dl>
+          
+          <hr class="hr" style="margin-top:0">
+          <p class="eyebrow" style="margin-top:var(--s4); margin-bottom:var(--s2)">Kontaktinfo</p>
+          <div style="display:grid; gap:var(--s3)">
+            <div class="field"><label for="p-mobil">Mobil</label><input class="input num" id="p-mobil" type="tel" value="+47 905 12 480"></div>
+            <div class="field"><label for="p-epost">E-post</label><input class="input" id="p-epost" type="email" value="marte.halvorsen@example.no"></div>
+          </div>
+        </article>
+
+        <article class="card" data-od-id="card-profil-dommerinfo">
+          <p class="eyebrow" style="margin-bottom: var(--s2); font-size: 12px;">Dommerinformasjon</p>
+          <dl style="margin:0">
+            <div class="drow"><dt>Dommernr.</dt><dd class="num">306871</dd></div>
+            <div class="drow"><dt>Klubb</dt><dd>Borgen IL</dd></div>
+            <div class="drow"><dt>Region</dt><dd>Region øst</dd></div>
+            <div class="drow"><dt>Dommernivå</dt><dd>Nivå 7<span class="sub"></span></dd></div>
+            <div class="drow"><dt>Roller</dt><dd>Dommer · Sekretariat</dd></div>
+          </dl>
+        </article>
+
+        <article class="card" data-od-id="card-profil-kontakt" style="opacity: 1;">
+          <p class="eyebrow" style="margin-bottom: var(--s2); font-size: 12px;">Reise</p>
+          <div style="display:grid; gap:var(--s3)">
+            <div class="field">
+              <label for="p-reise">Hvor langt kan du reise til kamp?</label>
+              <select class="input" id="p-reise">
+                <option>Inntil 20 km</option>
+                <option selected="">Inntil 45 km</option>
+                <option>Inntil 80 km</option>
+                <option>Hele kretsen</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="p-transport">Transport</label>
+              <select class="input" id="p-transport">
+                <option selected="">Kollektivt</option>
+                <option>Egen bil</option>
+                <option>Kollektivt eller bil</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" style="margin-top:var(--s4)" id="p-save" data-od-id="cta-lagre-profil" disabled="">Lagre endringer</button>
+        </article>
+
+        <article class="card" data-od-id="card-profil-reset">
+          <p class="eyebrow" style="margin-bottom: var(--s2); font-size: 12px;">Prototype</p>
+          <p class="muted" style="font-size:0.875rem">Nullstill sperrer, reservasjoner og kampstatus til utgangspunktet.</p>
+          <button class="btn btn-ghost btn-block" style="margin-top:var(--s3)" id="p-reset-demo" data-od-id="cta-nullstill-testdata">Tilbakestill testdata</button>
+        </article>
+
+
+      </section>
+
+      <!-- ── HONORAR ───────────────────────────────────────────────── -->
+      <section class="screen" id="s-invoice" data-od-id="screen-honorar" aria-label="Honorar">
+        <div>
+          <h2 style="font-size:1.25rem">Dømte kamper</h2>
+          <p class="muted" style="font-size:0.9375rem; margin-top:var(--s2)">Velg kampene du vil samle i ett honorarkrav.</p>
+        </div>
+        <div class="section-head" style="align-items:center">
+          <span class="muted" style="font-size:0.8125rem" id="invoice-selected">0 av 0 valgt</span>
+          <button class="linkbtn" id="invoice-toggle-all">Velg alle</button>
+        </div>
+        <div style="display:grid; gap:var(--s2)" id="invoice-list"></div>
+        <div class="total" data-od-id="honorar-sum">
+          <span class="tl">Totalt</span>
+          <span class="tv num" id="invoice-total">0 kr</span>
+        </div>
+        <button class="btn btn-primary btn-block" id="invoice-send" data-od-id="cta-send-honorar">Send til idrettsoppgjør</button>
+        <p class="sourcenote">Eksempeldata · satser er ikke reelle</p>
+      </section>
+
+    </div>
+
+    <!-- ══ SHEETS ═════════════════════════════════════════════════════ -->
+    <div class="scrim" id="scrim"></div>
+
+    <!-- meny -->
+    <nav class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Hovedmeny" hidden="" data-od-id="drawer">
+      <div class="drawer-head">
+        <span class="av" aria-hidden="true">MH</span>
+        <span class="id">
+          <span class="nm">Marte Halvorsen</span>
+          <span class="rl">Dommer</span>
+        </span>
+        <button class="iconbtn" data-close="" aria-label="Lukk meny" style="margin-left:auto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="drawer-nav">
+        <button data-tab="s-home" aria-current="page" data-od-id="nav-hjem">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"></path><path d="M6 10v9h12v-9"></path></svg>
+          Hjem
+        </button>
+        <button data-tab="s-matches" data-od-id="nav-kamper">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+          Kamper
+          <span class="drawer-dot" id="drawer-dot" hidden="" aria-hidden="true"></span>
+        </button>
+        <button data-tab="s-cal" data-od-id="nav-kalender">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path><path d="M8.5 14.5l2 2 4-4"></path></svg>
+          Kalender
+        </button>
+        <button data-tab="s-profile" data-od-id="nav-profil">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"></circle><path d="M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5"></path></svg>
+          Profil
+        </button>
+      </div>
+      <div class="drawer-foot">
+        <span class="sourcenote">TurneringsAdmin · Dommer</span>
+      </div>
+    </nav>
+
+    <!-- dag-editor -->
+    <div class="sheet" id="sheet-day" role="dialog" aria-modal="true" aria-labelledby="sd-title" hidden="">
+      <span class="grabber" aria-hidden="true"></span>
+      <div class="sheet-head">
+        <h2 id="sd-title">Dag</h2>
+        <button class="iconbtn" data-close="" aria-label="Lukk">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div id="sd-match" hidden=""></div>
+        <div id="sd-player-match" hidden=""></div>
+        <fieldset style="border:0; padding:0; margin:0">
+          <legend class="eyebrow" style="margin-bottom:var(--s2)">Tilgjengelighet denne dagen</legend>
+          <div class="radiolist">
+            <label class="radioitem">
+              <input type="radio" name="sd-mode" value="free" checked="">
+              <span><span class="rt">Ledig hele dagen</span> <br> <span class="rs">Kretsen kan sette deg opp når som helst</span></span>
+            </label>
+            <label class="radioitem">
+              <input type="radio" name="sd-mode" value="all">
+              <span><span class="rt">Kan ikke dømme hele dagen</span><br><span class="rs">Du får ikke oppdrag denne datoen</span></span>
+            </label>
+            <label class="radioitem">
+              <input type="radio" name="sd-mode" value="part">
+              <span><span class="rt">Kan ikke i et tidsrom</span><br><span class="rs">Oppgi når du er opptatt</span></span>
+            </label>
+          </div>
+          <div class="timepair" id="sd-times" hidden="">
+            <div class="field"><label for="sd-from">Fra</label><input class="input num" id="sd-from" type="time" value="18:00"></div>
+            <div class="field"><label for="sd-to">Til</label><input class="input num" id="sd-to" type="time" value="21:00"></div>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="sd-note">Årsak (valgfritt, synlig for kretsen)</label>
+          <input class="input" id="sd-note" type="text" placeholder="Jobb, reise, trening …">
+        </div>
+        <div class="srow" style="border-top:1px solid var(--border)">
+          <span><span class="st">Gjenta hver uke</span><span class="ss" id="sd-repeat-label">Samme ukedag framover</span></span>
+          <span class="switch"><input type="checkbox" id="sd-repeat"><span class="track" aria-hidden="true"></span><span class="knob" aria-hidden="true"></span></span>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary btn-block" id="sd-save">Lagre</button>
+        <button class="btn btn-ghost btn-block" id="sd-cancel" data-close="">Avbryt</button>
+      </div>
+    </div>
+
+    <!-- forfall / dommerbytte -->
+    <div class="sheet" id="sheet-decline" role="dialog" aria-modal="true" aria-labelledby="sc-title" hidden="">
+      <span class="grabber" aria-hidden="true"></span>
+      <div class="sheet-head">
+        <h2 id="sc-title">Meld forfall</h2>
+        <button class="iconbtn" data-close="" aria-label="Lukk">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <p class="muted" style="font-size:0.875rem" id="sc-lead">—</p>
+        <fieldset style="border:0; padding:0; margin:0">
+          <legend class="eyebrow" style="margin-bottom:var(--s2)">Hva gjelder det?</legend>
+          <div class="radiolist">
+            <label class="radioitem">
+              <input type="radio" name="sc-kind" value="forfall" checked="">
+              <span><span class="rt">Jeg melder forfall</span> <span class="rs">Kretsen finner ny dommer</span></span>
+            </label>
+            <label class="radioitem">
+              <input type="radio" name="sc-kind" value="bytte">
+              <span><span class="rt">Jeg søker dommerbytte</span> <span class="rs">Du beholder oppdraget til noen overtar</span></span>
+            </label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="sc-reason">Årsak</label>
+          <select class="input" id="sc-reason">
+            <option>Sykdom eller skade</option>
+            <option>Jobb</option>
+            <option>Reise</option>
+            <option>Kollisjon med annen kamp</option>
+            <option>Annet</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="sc-msg">Melding til kretsen (valgfritt)</label>
+          <textarea class="input" id="sc-msg" placeholder="Kort beskrivelse …"></textarea>
+        </div>
+        <p class="muted" style="font-size:0.8125rem">Kampen ligger mindre enn 72 timer fram i tid. Kretsen varsles umiddelbart.</p>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary btn-block" id="sc-send">Send inn</button>
+        <button class="btn btn-ghost btn-block" data-close="">Avbryt</button>
+      </div>
+    </div>
+
+    <!-- varsler -->
+    <div class="sheet" id="sheet-bell" role="dialog" aria-modal="true" aria-labelledby="sb-title" hidden="">
+      <span class="grabber" aria-hidden="true"></span>
+      <div class="sheet-head">
+        <h2 id="sb-title">Varsler</h2>
+        <button class="iconbtn" data-close="" aria-label="Lukk">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div>
+          <div class="notif">
+            <span class="dot" aria-hidden="true"></span>
+            <span>
+              <span class="nt">Nytt oppdrag: Follo 2 – Konnerud</span>
+              <span class="ns">3. divisjon avd. 2, mandag 23. november 18:00. Svar innen 20:00 i dag.</span>
+              <span class="nd">For 2 timer siden</span>
+            </span>
+          </div>
+          <div class="notif">
+            <span class="dot" aria-hidden="true"></span>
+            <span>
+              <span class="nt">Hallen er endret</span>
+              <span class="ns">Vålerenga – Linderud/Linje 5 flyttes til Jordalhallen. Samme kamptid.</span>
+              <span class="nd">I går 16:40</span>
+            </span>
+          </div>
+          
+          <div class="notif is-read">
+            <span class="dot" aria-hidden="true"></span>
+            <span>
+              <span class="nt">Honorar godkjent</span>
+              <span class="ns">Lyn 2 – Frigg, 31. oktober. Utbetales 25. november.</span>
+              <span class="nd">3. november</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-secondary btn-block" data-close="">Lukk</button>
+      </div>
+    </div>
+
+    <div class="sheet" id="sheet-old-ta" role="dialog" aria-modal="true" aria-labelledby="sot-title" hidden="">
+      <span class="grabber" aria-hidden="true"></span>
+      <div class="sheet-head">
+        <h2 id="sot-title">Gammel TA</h2>
+        <button class="iconbtn" data-close="" aria-label="Lukk">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <p class="muted" style="font-size:0.875rem">Du går nå til den gamle TA for å løse disse oppgavene.</p>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary btn-block" id="sot-continue">Fortsett</button>
+        <button class="btn btn-ghost btn-block" data-close="">Avbryt</button>
+      </div>
+    </div>
+
+    <div class="sheet" id="sheet-reservation" role="dialog" aria-modal="true" aria-labelledby="rv-title" hidden="">
+      <span class="grabber" aria-hidden="true"></span>
+      <div class="sheet-head">
+        <h2 id="rv-title">Legg til reservasjon</h2>
+        <button class="iconbtn" data-close="" aria-label="Lukk">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <label for="rv-team">Lag eller organisasjon</label>
+          <input class="input" id="rv-team" placeholder="Navn på lag eller organisasjon">
+        </div>
+        <div class="field">
+          <label for="rv-reason">Årsak</label>
+          <textarea class="input" id="rv-reason" placeholder="Hvorfor sperrer dette laget deg som dommer?"></textarea>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary btn-block" id="rv-save">Lagre</button>
+        <button class="btn btn-ghost btn-block" data-close="">Avbryt</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4 10-10"></path></svg>
+      <span id="toast-text"></span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ═══ demo-anker: prototypen er satt til onsdag 11. november 2026 ═══ */
+var TODAY = new Date(2026, 10, 11);
+var MONTHS = ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
+var MON_SHORT = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
+var DAYS = ['søndag','mandag','tirsdag','onsdag','torsdag','fredag','lørdag'];
+var DAY_SHORT = ['SØN','MAN','TIR','ONS','TOR','FRE','LØR'];
+
+function iso(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fromIso(s){ var p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function pretty(s){ var d = fromIso(s); return DAYS[d.getDay()] + ' ' + d.getDate() + '. ' + MONTHS[d.getMonth()]; }
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ═══ data ═══ */
+var MATCHES = [
+  { id:'m-kfum', date:'2026-11-23', time:'17:00', home:'Vålerenga', away:'Linderud/Linje 5',
+    comp:'2. Divisjon menn', venue:'Jordalhallen', role:'Dommer',
+    team:'Meddommer Henrik Berg', fee:1500, contact:'Terje Lund, KFUM Oslo · 918 44 207',
+    leadReferee:'Lise Haugen, Oslo Håndballkrets', secretariat:'Vålerenga IF',
+    status:'confirmed', meet:'16:15' },
+  { id:'m-skeid', date:'2026-11-23', time:'18:00', home:'Follo 2', away:'Konnerud',
+    comp:'3. divisjon avd. 2', venue:'Skihallen', role:'Dommer',
+    team:'Meddommer Jonas Five', fee:1150, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'pending', deadline:'i dag 20:00', observer:'Kari Nordby, Oslo Håndballkrets' },
+  { id:'m-kjelsas', date:'2026-11-24', time:'19:00', home:'HK Herulf Moss', away:'Haslum HK 2',
+    comp:'Kvinner 2. divisjon', venue:'Mossehallen A', role:'Dommer 2',
+    team:'Dommer Sofie Rygh · Sekretariat Petter Aune', fee:800, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'confirmed', meet:'18:15' },
+  { id:'m-frigg', date:'2026-11-28', time:'11:00', home:'Frigg G14', away:'Nordstrand G14',
+    comp:'G14 Interkrets', venue:'Frognerhallen', role:'Dommer',
+    team:'Du dømmer alene', fee:500, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'open' },
+  { id:'m-grorud', date:'2026-12-05', time:'12:30', home:'Grorud G16', away:'Skeid G16',
+    comp:'G16 Interkrets', venue:'Grorud Idrettshall', role:'Dommer',
+    team:'Du dømmer alene', fee:650, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'open' },
+  { id:'m-bjerke2', date:'2026-12-02', time:'18:00', home:'Bjerke', away:'Lyn 2',
+    comp:'3. divisjon avd. 2', venue:'Bjerkehallen', role:'Dommer',
+    team:'Meddommer Jonas Five · Sekretariat Amina Sow', fee:1150, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'confirmed', meet:'17:15' },
+  { id:'m-njaard2', date:'2026-12-04', time:'15:00', home:'Njård', away:'Nordstrand',
+    comp:'Kvinner 2. divisjon', venue:'Njårdhallen', role:'Dommer 2',
+    team:'Dommer Sofie Rygh · Sekretariat Petter Aune', fee:800, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'confirmed', meet:'14:15' },
+  { id:'m-korsvoll2', date:'2026-12-06', time:'11:00', home:'Korsvoll G14', away:'Frigg G14',
+    comp:'G14 Interkrets', venue:'Korsvollhallen', role:'Dommer',
+    team:'Du dømmer alene', fee:500, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'open' },
+  { id:'m-vallhall', date:'2026-12-09', time:'19:00', home:'Vallhall', away:'Bækkelaget',
+    comp:'3. divisjon avd. 2', venue:'Bjerkehallen', role:'Dommer',
+    team:'Meddommer Petter Aune', fee:1150, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'pending', deadline:'09.12 20:00' },
+  { id:'m-ullern', date:'2026-12-12', time:'16:30', home:'Ullern 2', away:'Haslum HK 2',
+    comp:'Kvinner 2. divisjon', venue:'Ullernhallen', role:'Dommer 2',
+    team:'Dommer Sofie Rygh', fee:800, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'open' },
+  { id:'m-hasleloren', date:'2026-12-15', time:'12:00', home:'Hasle-Løren G16', away:'Skeid G16',
+    comp:'G16 Interkrets', venue:'Haslehallen', role:'Dommer',
+    team:'Du dømmer alene', fee:650, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'open' },
+  { id:'m-voldslokka', date:'2026-12-19', time:'17:00', home:'Lyn 2', away:'Follo 2',
+    comp:'3. divisjon avd. 2', venue:'Voldsløkka-hallen', role:'Dommer',
+    team:'Meddommer Amina Sow · Sekretariat Jonas Five', fee:1150, contact:'Oslo Håndballkrets · dommer@osloHK.example.no',
+    status:'confirmed', meet:'16:15' },
+  { id:'m-valer', date:'2026-11-07', time:'14:00', home:'Vålerenga 2', away:'Bækkelaget',
+    comp:'3. divisjon avd. 2', venue:'Valle Hovin-hallen', role:'Dommer',
+    team:'Meddommer Jonas Five · Sekretariat Amina Sow', fee:1150, contact:'Oslo Håndballkrets',
+    status:'ready' },
+  { id:'m-bjerke', date:'2026-10-24', time:'17:30', home:'Bjerke', away:'Vallhall',
+    comp:'3. divisjon avd. 2', venue:'Bjerkehallen', role:'Dommer',
+    team:'Meddommer Petter Aune · Sekretariat Jonas Five', fee:1150, contact:'Oslo Håndballkrets',
+    status:'ready' },
+  { id:'m-njaard', date:'2026-10-18', time:'15:00', home:'Njård', away:'Ready',
+    comp:'Kvinner 2. divisjon', venue:'Njårdhallen', role:'Dommer 2',
+    team:'Dommer Sofie Rygh · Sekretariat Amina Sow', fee:800, contact:'Oslo Håndballkrets',
+    status:'ready' },
+  { id:'m-korsvoll', date:'2026-11-04', time:'11:00', home:'Korsvoll G14', away:'Hasle-Løren G14',
+    comp:'G14 Interkrets', venue:'Korsvollhallen', role:'Dommer',
+    team:'Du dømmer alene', fee:500, contact:'Oslo Håndballkrets',
+    status:'ready' },
+  { id:'m-nordst', date:'2026-11-01', time:'16:00', home:'Nordstrand', away:'Ullern 2',
+    comp:'Kvinner 2. divisjon', venue:'Ekeberghallen', role:'Dommer 2',
+    team:'Dommer Sofie Rygh', fee:250, contact:'Oslo Håndballkrets',
+    status:'ready' },
+  { id:'m-lyn', date:'2026-10-31', time:'13:00', home:'Lyn 2', away:'Frigg',
+    comp:'3. divisjon avd. 2', venue:'Voldsløkka-hallen', role:'Dommer',
+    team:'Meddommer Petter Aune · Sekretariat Amina Sow', fee:1150, contact:'Oslo Håndballkrets',
+    status:'invoiced' }
+];
+
+var PLAYER_TEAM = 'Bækkelaget';
+var PLAYER_MATCHES = [
+  { date:'2026-11-14', time:'17:00', opponent:'Ready', comp:'3. divisjon kvinner', venue:'Bækkelagshallen' },
+  { date:'2026-12-20', time:'14:00', opponent:'Njård', comp:'3. divisjon kvinner', venue:'Njårdhallen' }
+];
+
+var DEFAULT_RESERVATIONS = [
+  { team: PLAYER_TEAM, reason: 'Du er registrert som spiller her. Kamper for laget sperrer automatisk dagen for dommeroppdrag.' }
+];
+
+var DEFAULT_BLOCKS = [
+  { date:'2026-11-17', mode:'all',  note:'Reise – jobb' },
+  { date:'2026-11-18', mode:'all',  note:'Reise – jobb' },
+  { date:'2026-11-19', mode:'all',  note:'Reise – jobb' },
+  { weekday:2,         mode:'part', from:'18:00', to:'21:00', note:'Egen trening' }
+];
+
+var LS = { screen:'ta.screen', blocks:'ta.blocks', status:'ta.status', text:'ta.text', reservations:'ta.reservations' };
+function load(key, fallback){
+  try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+
+try { localStorage.removeItem(LS.status); } catch(e){}
+var blocks = load(LS.blocks, DEFAULT_BLOCKS);
+var reservations = load(LS.reservations, DEFAULT_RESERVATIONS);
+var statusOverride = {};
+
+function setStatus(id, s){
+  var m = byId(id); if (!m) return;
+  m.status = s; statusOverride[id] = s;
+}
+function byId(id){ for (var i=0;i<MATCHES.length;i++) if (MATCHES[i].id === id) return MATCHES[i]; return null; }
+
+/* ═══ status-visning: form + glyf + ord, aldri farge alene ═══ */
+var ICON_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4 10-10"/></svg>';
+var ICON_BANG  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v6"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>';
+var ICON_PLUS  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+var ICON_SLASH = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M6 18L18 6"/></svg>';
+var ICON_DOC   = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/></svg>';
+
+function statusChip(m){
+  if (m.status === 'confirmed') return '<span class="chip chip-success">' + ICON_CHECK + ' Bekreftet</span>';
+  if (m.status === 'pending')   return '<span class="chip chip-action">' + ICON_BANG + ' Krever svar</span>';
+  if (m.status === 'open')      return '<span class="chip chip-outline">' + ICON_PLUS + ' Ledig oppdrag</span>';
+  if (m.status === 'applied')   return '<span class="chip chip-warm">' + ICON_CHECK + ' Søkt</span>';
+  if (m.status === 'declined')  return '<span class="chip chip-danger">' + ICON_SLASH + ' Forfall sendt</span>';
+  if (m.status === 'swap')      return '<span class="chip chip-warm">' + ICON_SLASH + ' Bytte søkt</span>';
+  if (m.status === 'ready')     return '<span class="chip chip-action">' + ICON_DOC + ' Klar for honorar</span>';
+  if (m.status === 'invoiced')  return '<span class="chip chip-success">' + ICON_CHECK + ' Honorar sendt</span>';
+  return '';
+}
+
+var CARET = '<svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+
+function matchRow(m){
+  var d = fromIso(m.date);
+  var urgent = m.status === 'pending' ? ' is-urgent' : '';
+  var extra = '';
+  if (m.status === 'pending' && m.deadline) extra = '<span class="chip chip-flat chip-mono">' + ICON_BANG + ' Svarfrist ' + m.deadline + '</span>';
+  else if (m.status === 'ready') extra = '<span class="chip chip-flat chip-mono">' + m.fee + ' kr</span>';
+  else extra = '<span class="chip chip-flat chip-mono">' + m.role + '</span>';
+  var warn = m.status === 'pending' ? '<span class="warn">Svarer du ikke, gis kampen til noen andre.</span>' : '';
+  return '<button class="mrow' + urgent + '" data-match="' + m.id + '">' +
+    '<span class="when" aria-hidden="true"><span class="d">' + d.getDate() + '</span><span class="m">' + MON_SHORT[d.getMonth()] + '</span></span>' +
+    '<span class="body">' +
+      '<span class="teams">' + m.home + ' – ' + m.away + '</span>' +
+      '<span class="meta"><span class="num">' + DAY_SHORT[d.getDay()] + ' ' + m.time + '</span><span>·</span><span>' + m.venue + '</span></span>' +
+      '<span class="tags">' + (m.status === 'pending' ? '' : statusChip(m)) + extra + '</span>' +
+      warn +
+    '</span>' + CARET +
+  '</button>';
+}
+
+/* ═══ navigasjon ═══ */
+var TABS = ['s-home','s-matches','s-cal','s-profile'];
+var TITLES = { 's-home':'Hei, Marte', 's-matches':'Kamper', 's-cal':'Din kalender',
+  's-profile':'Min profil', 's-match':'Kampinfo', 's-invoice':'Send til idrettsoppgjør' };
+var current = 's-home';
+var backTo = null;
+
+function showScreen(id, opts){
+  opts = opts || {};
+  var all = document.querySelectorAll('#screens .screen');
+  for (var i=0;i<all.length;i++) all[i].classList.toggle('is-active', all[i].id === id);
+  current = id;
+  document.getElementById('appbar-title').textContent = TITLES[id] || '';
+  var isTab = TABS.indexOf(id) > -1;
+  backTo = isTab ? null : (opts.from || 's-home');
+  document.getElementById('back-btn').hidden = isTab;
+  document.getElementById('menu-btn').hidden = !isTab;
+  var tb = document.querySelectorAll('#drawer button[data-tab]');
+  for (var j=0;j<tb.length;j++){
+    var t = tb[j].getAttribute('data-tab');
+    if (t === id) tb[j].setAttribute('aria-current','page'); else tb[j].removeAttribute('aria-current');
+  }
+  if (isTab) save(LS.screen, id);
+  document.getElementById('screens').scrollTop = 0;
+}
+
+document.getElementById('drawer').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-tab]'); if (!b) return;
+  showScreen(b.getAttribute('data-tab'));
+  drawerClose();
+});
+document.getElementById('back-btn').addEventListener('click', function(){
+  showScreen(backTo || 's-home');
+});
+
+showScreen('s-home');   /* flyten starter alltid på oversikten */
+
+/* ═══ sheets ═══ */
+var openSheet = null, lastFocus = null, oldTaTarget = null;
+function sheetOpen(id){
+  var el = document.getElementById(id);
+  el.hidden = false;
+  lastFocus = document.activeElement;
+  /* to frames: arket går fra display:none, så layouten må være beregnet
+     før klassen settes — ellers hopper det opp uten animasjon. */
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      el.classList.add('is-open');
+      document.getElementById('scrim').classList.add('is-open');
+    });
+  });
+  openSheet = id;
+  var f = el.querySelector('input, select, textarea, button');
+  if (f) f.focus();
+}
+function sheetClose(){
+  if (!openSheet) return;
+  var el = document.getElementById(openSheet);
+  el.classList.remove('is-open');
+  document.getElementById('scrim').classList.remove('is-open');
+  var id = openSheet; openSheet = null;
+  setTimeout(function(){ if (openSheet !== id) document.getElementById(id).hidden = true; }, 240);
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+/* ═══ meny (drawer) ═══ */
+var drawerIsOpen = false;
+function drawerOpen(){
+  var el = document.getElementById('drawer');
+  el.hidden = false;
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      el.classList.add('is-open');
+      document.getElementById('scrim').classList.add('is-open');
+    });
+  });
+  drawerIsOpen = true;
+  document.getElementById('menu-btn').setAttribute('aria-expanded','true');
+  var f = el.querySelector('button');
+  if (f) f.focus();
+}
+function drawerClose(){
+  if (!drawerIsOpen) return;
+  var el = document.getElementById('drawer');
+  el.classList.remove('is-open');
+  document.getElementById('scrim').classList.remove('is-open');
+  drawerIsOpen = false;
+  document.getElementById('menu-btn').setAttribute('aria-expanded','false');
+  setTimeout(function(){ if (!drawerIsOpen) el.hidden = true; }, 240);
+  document.getElementById('menu-btn').focus();
+}
+document.getElementById('menu-btn').addEventListener('click', drawerOpen);
+
+document.getElementById('scrim').addEventListener('click', function(){ if (drawerIsOpen) drawerClose(); else sheetClose(); });
+document.addEventListener('click', function(e){
+  var c = e.target.closest('[data-close]'); if (!c) return;
+  if (c.closest('#drawer')) drawerClose(); else sheetClose();
+});
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ if (drawerIsOpen) drawerClose(); else sheetClose(); } });
+
+document.getElementById('p-reset-demo').addEventListener('click', function(){
+  [LS.blocks, LS.reservations, LS.screen, LS.status, LS.text].forEach(function(key){
+    try { localStorage.removeItem(key); } catch(e){}
+  });
+  toast('Testdata tilbakestilt. Laster på nytt …');
+  setTimeout(function(){ location.reload(); }, 900);
+});
+
+var toastTimer = null;
+function toast(msg){
+  document.getElementById('toast-text').textContent = msg;
+  var t = document.getElementById('toast');
+  t.classList.add('is-open');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('is-open'); }, 3200);
+}
+
+/* ═══ kampliste ═══ */
+var filter = 'upcoming';
+var HINTS = {
+  upcoming:'Oppdrag du er satt opp på. Du må svare innen svarfristen.',
+  open:'Kamper kretsen mangler dommer til. Søk, og du får svar innen ett døgn.',
+  done:'Kamper du har dømt. Herfra sender du honorarkrav.'
+};
+function inFilter(m){
+  if (filter === 'upcoming') return ['confirmed','pending','applied','declined','swap'].indexOf(m.status) > -1 && fromIso(m.date) >= TODAY;
+  if (filter === 'open') return m.status === 'open';
+  return ['ready','invoiced'].indexOf(m.status) > -1;
+}
+function renderMatches(){
+  var list = MATCHES.filter(inFilter).sort(function(a,b){
+    if (filter === 'upcoming'){
+      var ap = a.status === 'pending', bp = b.status === 'pending';
+      if (ap !== bp) return ap ? -1 : 1;
+    }
+    return filter === 'done' ? (a.date < b.date ? 1 : -1) : (a.date > b.date ? 1 : -1);
+  });
+  document.getElementById('match-list').innerHTML = list.length
+    ? list.map(matchRow).join('')
+    : '<p class="empty">Ingen kamper her nå.</p>';
+  document.getElementById('matches-hint').textContent = HINTS[filter];
+}
+document.querySelectorAll('.segmented button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.segmented button').forEach(function(x){ x.setAttribute('aria-selected','false'); });
+    b.setAttribute('aria-selected','true');
+    filter = b.getAttribute('data-filter');
+    renderMatches();
+  });
+});
+
+function renderHome(){
+  var list = MATCHES.filter(function(m){
+    return m.status === 'confirmed' && m.date > iso(TODAY);
+  }).sort(function(a,b){ return a.date > b.date ? 1 : -1; }).slice(0,3);
+  document.getElementById('home-matches').innerHTML = list.map(matchRow).join('');
+  var pending = MATCHES.filter(function(m){ return m.status === 'pending'; }).length;
+  var readyMatches = MATCHES.filter(function(m){ return m.status === 'ready'; });
+  var ready = readyMatches.length;
+  var readySum = readyMatches.reduce(function(s,m){ return s + m.fee; }, 0);
+  var n = (ready ? 1 : 0) + 2;
+  document.getElementById('queue-count').textContent = n;
+  document.getElementById('q-answer').hidden = pending === 0;
+  document.getElementById('queue-honorar').hidden = ready === 0;
+  document.getElementById('queue-honorar-text').textContent = ready + (ready === 1 ? ' oppdrag klart for idrettsoppgjør' : ' oppdrag klare for idrettsoppgjør');
+  document.getElementById('queue-honorar-amount').textContent = readySum.toLocaleString('nb-NO') + ' kr';
+  document.getElementById('drawer-dot').hidden = pending === 0;
+}
+
+/* ═══ kampinfo ═══ */
+var detailId = null;
+function openMatch(id, from){
+  var m = byId(id); if (!m) return;
+  detailId = id;
+  var d = fromIso(m.date);
+  var chips = statusChip(m);
+  if (m.status === 'pending' && m.deadline) chips += '<span class="chip chip-flat chip-mono">Svarfrist ' + m.deadline + '</span>';
+  document.getElementById('md-chips').innerHTML = chips;
+  document.getElementById('md-teams').textContent = m.home + ' – ' + m.away;
+  document.getElementById('md-comp').textContent = m.comp;
+  document.getElementById('md-time').innerHTML = '<span class="num">' + cap(DAYS[d.getDay()]) + ' ' + d.getDate() + '. ' + MONTHS[d.getMonth()] + ' · ' + m.time + '</span>' +
+    (m.meet ? '<span class="sub">Oppmøte ' + m.meet + '</span>' : '');
+  document.getElementById('md-venue').textContent = m.venue;
+  document.getElementById('md-role').textContent = m.role;
+  document.getElementById('md-team').textContent = m.team;
+  document.getElementById('md-secretariat').textContent = m.secretariat || 'Stilles av hjemmelaget';
+  document.getElementById('md-fee').innerHTML = '<span class="num">' + m.fee + ' kr</span><span class="sub">Kamphonorar etter kretsens satser</span>';
+  document.getElementById('md-contact').textContent = m.contact;
+
+  var a = '', note = '';
+  if (m.status === 'pending'){
+    a = '<button class="btn btn-primary btn-block" data-accept="' + m.id + '">Ta oppdraget</button>' +
+        '<button class="btn btn-secondary btn-block" data-decline="' + m.id + '">Kan ikke dømme denne</button>';
+    note = 'Svarer du ikke før fristen, går oppdraget videre til neste dommer på lista.';
+  } else if (m.status === 'confirmed'){
+    a = '<button class="btn btn-secondary btn-block" data-decline="' + m.id + '">Søk fritak</button>';
+    note = 'Endringer nærmere enn 72 timer før kampstart varsles kretsen umiddelbart.';
+  } else if (m.status === 'open'){
+    a = '<button class="btn btn-primary btn-block" data-apply="' + m.id + '">Søk på oppdraget</button>';
+    note = 'Kampen er ledig. Søker du, holder kretsen plassen til den er tildelt.';
+  } else if (m.status === 'applied'){
+    a = '<button class="btn btn-secondary btn-block" data-withdraw="' + m.id + '">Trekk søknaden</button>';
+    note = 'Du får push når kretsen har tildelt kampen.';
+  } else if (m.status === 'ready'){
+    a = '<button class="btn btn-primary btn-block" data-go="s-invoice">Send honorarkrav</button>';
+    note = 'Kampen er rapportert ferdig. Honorar utbetales den 25. etter godkjenning.';
+  } else if (m.status === 'invoiced'){
+    note = 'Honorarkravet er sendt og godkjent av kretsen.';
+  } else {
+    note = 'Kretsen har fått beskjed og leter etter ny dommer.';
+  }
+  document.getElementById('md-actions').innerHTML = a;
+  document.getElementById('md-note').textContent = note;
+  showScreen('s-match', { from: from || 's-matches' });
+}
+
+document.addEventListener('click', function(e){
+  var g = e.target.closest('[data-go]');
+  if (g){
+    var tgt = g.getAttribute('data-go');
+    if (g.hasAttribute('data-month')) calMonth = new Date(2026, +g.getAttribute('data-month'), 1), renderCal();
+    showScreen(tgt, { from: current });
+    sheetClose();
+    return;
+  }
+  var mb = e.target.closest('[data-match]');
+  if (mb){ openMatch(mb.getAttribute('data-match'), current); return; }
+
+  var ot = e.target.closest('[data-old-ta]');
+  if (ot){ oldTaTarget = ot.getAttribute('data-old-ta'); sheetOpen('sheet-old-ta'); return; }
+
+  var ac = e.target.closest('[data-accept]');
+  if (ac){
+    setStatus(ac.getAttribute('data-accept'), 'confirmed');
+    renderAll(); openMatch(ac.getAttribute('data-accept'), backTo);
+    toast('Oppdraget er bekreftet. Det ligger nå i Kampene mine.');
+    return;
+  }
+  var ap = e.target.closest('[data-apply]');
+  if (ap){
+    setStatus(ap.getAttribute('data-apply'), 'applied');
+    renderAll(); openMatch(ap.getAttribute('data-apply'), backTo);
+    toast('Søknaden er sendt til Oslo Håndballkrets.');
+    return;
+  }
+  var wd = e.target.closest('[data-withdraw]');
+  if (wd){
+    setStatus(wd.getAttribute('data-withdraw'), 'open');
+    renderAll(); openMatch(wd.getAttribute('data-withdraw'), backTo);
+    toast('Søknaden er trukket.');
+    return;
+  }
+  var dc = e.target.closest('[data-decline]');
+  if (dc){ openDecline(dc.getAttribute('data-decline')); return; }
+});
+
+document.getElementById('q-answer').addEventListener('click', function(){ openMatch('m-skeid','s-home'); });
+document.getElementById('sot-continue').addEventListener('click', function(){
+  sheetClose();
+  openMatch(oldTaTarget, current);
+});
+
+/* ═══ forfall / bytte ═══ */
+var declineId = null;
+function openDecline(id){
+  var m = byId(id); if (!m) return;
+  declineId = id;
+  var d = fromIso(m.date);
+  document.getElementById('sc-lead').textContent = m.home + ' – ' + m.away + ', ' +
+    DAYS[d.getDay()] + ' ' + d.getDate() + '. ' + MONTHS[d.getMonth()] + ' kl. ' + m.time + '.';
+  sheetOpen('sheet-decline');
+}
+document.getElementById('sc-send').addEventListener('click', function(){
+  var kind = document.querySelector('input[name="sc-kind"]:checked').value;
+  setStatus(declineId, kind === 'bytte' ? 'swap' : 'declined');
+  sheetClose();
+  renderAll();
+  if (current === 's-match') openMatch(declineId, backTo);
+  toast(kind === 'bytte' ? 'Søknad om dommerbytte er sendt.' : 'Forfall er registrert. Kretsen finner ny dommer.');
+});
+document.querySelectorAll('input[name="sc-kind"]').forEach(function(r){
+  r.addEventListener('change', function(){
+    document.getElementById('sc-title').textContent = r.value === 'bytte' ? 'Søk dommerbytte' : 'Meld forfall';
+  });
+});
+
+/* ═══ kalender ═══ */
+var calMonth = new Date(2026, 10, 1);
+var selected = null;
+
+function blockFor(dateStr){
+  var wd = fromIso(dateStr).getDay();
+  for (var i=0;i<blocks.length;i++){
+    if (blocks[i].date === dateStr) return blocks[i];
+  }
+  for (var j=0;j<blocks.length;j++){
+    if (blocks[j].weekday === wd) return blocks[j];
+  }
+  return null;
+}
+function matchesOn(dateStr){
+  return MATCHES.filter(function(m){
+    return m.date === dateStr && ['confirmed','pending','applied'].indexOf(m.status) > -1;
+  });
+}
+function playerMatchOn(dateStr){
+  for (var i=0;i<PLAYER_MATCHES.length;i++){ if (PLAYER_MATCHES[i].date === dateStr) return PLAYER_MATCHES[i]; }
+  return null;
+}
+
+function renderCalInto(gridId, monthId){
+  document.getElementById(monthId).textContent = cap(MONTHS[calMonth.getMonth()]) + ' ' + calMonth.getFullYear();
+  var first = new Date(calMonth.getFullYear(), calMonth.getMonth(), 1);
+  var lead = (first.getDay() + 6) % 7;            // mandag først
+  var start = new Date(first); start.setDate(1 - lead);
+  var html = '';
+  for (var i=0;i<42;i++){
+    var d = new Date(start); d.setDate(start.getDate() + i);
+    if (i >= 35 && d.getMonth() !== calMonth.getMonth()) break;
+    var s = iso(d);
+    var out = d.getMonth() !== calMonth.getMonth();
+    var b = blockFor(s);
+    var pm = playerMatchOn(s);
+    var ms = matchesOn(s);
+    var cls = ['day'];
+    if (out) cls.push('is-out');
+    if (s === iso(TODAY)) cls.push('is-today');
+    if (b || pm) cls.push('is-blocked');
+    if (s === selected) cls.push('is-selected');
+    var marks = '';
+    if (ms.length) marks += '<span class="mk-match"></span>';
+    if (b || pm) marks += '<span class="mk-block"></span>';
+    var say = d.getDate() + '. ' + MONTHS[d.getMonth()] + ', ';
+    if (pm) say += 'sperret, du spiller kamp selv for ' + PLAYER_TEAM;
+    else if (b) say += (b.mode === 'all' ? 'sperret hele dagen' : 'sperret ' + b.from + ' til ' + b.to);
+    else say += 'ledig';
+    if (ms.length) say += ', har kamp ' + ms[0].time;
+    html += '<button class="' + cls.join(' ') + '" data-date="' + s + '">' +
+      '<span class="dn" aria-hidden="true">' + d.getDate() + '</span>' +
+      '<span class="marks" aria-hidden="true">' + marks + '</span>' +
+      '<span class="sr-only">' + say + '</span>' +
+    '</button>';
+  }
+  document.getElementById(gridId).innerHTML = html;
+}
+function renderCal(){
+  renderCalInto('cal-grid', 'cal-month');
+  renderCalInto('home-cal-grid', 'home-cal-month');
+}
+document.getElementById('cal-prev').addEventListener('click', function(){
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1); renderCal();
+});
+document.getElementById('cal-next').addEventListener('click', function(){
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); renderCal();
+});
+document.getElementById('home-cal-prev').addEventListener('click', function(){
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1); renderCal();
+});
+document.getElementById('home-cal-next').addEventListener('click', function(){
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); renderCal();
+});
+document.getElementById('cal-grid').addEventListener('click', function(e){
+  var b = e.target.closest('.day'); if (!b) return;
+  openDay(b.getAttribute('data-date'));
+});
+document.getElementById('home-cal-grid').addEventListener('click', function(e){
+  var b = e.target.closest('.day'); if (!b) return;
+  openDay(b.getAttribute('data-date'));
+});
+
+function openDay(s){
+  selected = s; renderCal();
+  var d = fromIso(s);
+  document.getElementById('sd-title').textContent = cap(pretty(s));
+  document.getElementById('sd-repeat-label').textContent = 'Hver ' + DAYS[d.getDay()] + ' framover';
+
+  var ms = matchesOn(s);
+  var box = document.getElementById('sd-match');
+  if (ms.length){
+    box.hidden = false;
+    box.innerHTML = '<div class="card card-quiet"><p class="eyebrow">Du er satt opp på kamp</p>' +
+      '<p style="font-weight:650;font-size:0.9375rem;margin-top:var(--s2)">' + ms[0].time + ' · ' + ms[0].home + ' – ' + ms[0].away + '</p>' +
+      '<p class="muted" style="font-size:0.8125rem;margin-top:2px">' + ms[0].venue + '. Sperrer du dagen, må du melde forfall separat.</p></div>';
+  } else { box.hidden = true; box.innerHTML = ''; }
+
+  var pm = playerMatchOn(s);
+  var pbox = document.getElementById('sd-player-match');
+  if (pm){
+    pbox.hidden = false;
+    pbox.innerHTML = '<div class="card card-quiet"><p class="eyebrow">Du spiller kamp selv</p>' +
+      '<p style="font-weight:650;font-size:0.9375rem;margin-top:var(--s2)">' + pm.time + ' · ' + PLAYER_TEAM + ' – ' + pm.opponent + '</p>' +
+      '<p class="muted" style="font-size:0.8125rem;margin-top:2px">' + pm.venue + '. Dagen sperres automatisk for dommeroppdrag.</p></div>';
+  } else { pbox.hidden = true; pbox.innerHTML = ''; }
+
+  var auto = !!pm;
+  var b = blockFor(s);
+  var mode = auto ? 'all' : (b ? b.mode : 'free');
+  document.querySelector('input[name="sd-mode"][value="' + mode + '"]').checked = true;
+  document.getElementById('sd-times').hidden = mode !== 'part';
+  document.getElementById('sd-from').value = (b && b.from) || '18:00';
+  document.getElementById('sd-to').value = (b && b.to) || '21:00';
+  document.getElementById('sd-note').value = auto ? ('Spiller kamp for ' + PLAYER_TEAM) : ((b && b.note) || '');
+  document.getElementById('sd-repeat').checked = !!(b && typeof b.weekday === 'number');
+  document.querySelectorAll('input[name="sd-mode"]').forEach(function(r){ r.disabled = auto; });
+  document.getElementById('sd-note').disabled = auto;
+  document.getElementById('sd-repeat').disabled = auto;
+  document.getElementById('sd-save').hidden = auto;
+  document.getElementById('sd-cancel').textContent = auto ? 'Lukk' : 'Avbryt';
+  sheetOpen('sheet-day');
+}
+document.querySelectorAll('input[name="sd-mode"]').forEach(function(r){
+  r.addEventListener('change', function(){
+    document.getElementById('sd-times').hidden = r.value !== 'part';
+  });
+});
+document.getElementById('sd-save').addEventListener('click', function(){
+  var mode = document.querySelector('input[name="sd-mode"]:checked').value;
+  var repeat = document.getElementById('sd-repeat').checked;
+  var wd = fromIso(selected).getDay();
+  blocks = blocks.filter(function(b){ return b.date !== selected && b.weekday !== wd; });
+  if (mode !== 'free'){
+    var nb = { mode:mode, note:document.getElementById('sd-note').value.trim() || 'Ikke oppgitt' };
+    if (mode === 'part'){ nb.from = document.getElementById('sd-from').value; nb.to = document.getElementById('sd-to').value; }
+    if (repeat) nb.weekday = wd; else nb.date = selected;
+    blocks.push(nb);
+  }
+  save(LS.blocks, blocks);
+  sheetClose(); renderAll();
+  toast(mode === 'free' ? 'Dagen er satt tilbake til ledig.' : 'Tilgjengeligheten er oppdatert.');
+});
+
+function renderBlocks(){
+  var autoRows = PLAYER_MATCHES.map(function(pm){
+    return { date:pm.date, mode:'all', note:'Du spiller ' + PLAYER_TEAM + ' – ' + pm.opponent, auto:true };
+  });
+  var rows = autoRows.concat(blocks).sort(function(a,b){
+    if (a.date && b.date) return a.date > b.date ? 1 : -1;
+    if (a.date) return -1; if (b.date) return 1;
+    return a.weekday - b.weekday;
+  });
+  document.getElementById('block-list').innerHTML = rows.length ? rows.map(function(b, i){
+    var title = typeof b.weekday === 'number' ? 'Hver ' + DAYS[b.weekday] : cap(pretty(b.date));
+    var when = b.mode === 'all' ? 'Hele dagen' : b.from + '–' + b.to;
+    var action = b.auto
+      ? '<span class="chip chip-flat chip-mono">Automatisk</span>'
+      : '<button class="linkbtn" data-rm="' + i + '">Fjern</button>';
+    return '<div class="brow"><span><span class="bt">' + title + '</span><br>' +
+      '<span class="bs">' + when + ' · ' + b.note + '</span></span>' +
+      action + '</div>';
+  }).join('') : '<p class="empty">Du har ingen sperrer. Kretsen kan sette deg opp når som helst.</p>';
+
+  document.querySelectorAll('[data-rm]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx = +btn.getAttribute('data-rm');
+      var key = rows[idx];
+      blocks = blocks.filter(function(b){ return b !== key; });
+      save(LS.blocks, blocks);
+      renderAll();
+      toast('Sperren er fjernet.');
+    });
+  });
+}
+
+function renderReservations(){
+  document.getElementById('reservation-list').innerHTML = reservations.length ? reservations.map(function(r){
+    return '<div class="card card-quiet"><p style="font-weight:650;font-size:0.9375rem">' + r.team + '</p>' +
+      '<p class="muted" style="font-size:0.8125rem;margin-top:2px">' + r.reason + '</p></div>';
+  }).join('') : '<p class="empty">Du har ingen reservasjoner.</p>';
+}
+
+var calView = 'matches';
+function renderCalLists(){
+  var ms = MATCHES.filter(function(m){
+    return ['confirmed','pending','applied','declined','swap'].indexOf(m.status) > -1 && fromIso(m.date) >= TODAY;
+  }).sort(function(a,b){ return a.date > b.date ? 1 : -1; });
+  document.getElementById('cal-match-list').innerHTML = ms.length
+    ? ms.map(matchRow).join('')
+    : '<p class="empty">Ingen kommende kamper.</p>';
+  renderReservations();
+  document.getElementById('cal-match-list').hidden = calView !== 'matches';
+  document.getElementById('block-list').hidden = calView !== 'blocks';
+  document.getElementById('reservation-panel').hidden = calView !== 'reservations';
+  document.getElementById('cal-count').textContent = calView === 'matches' ? ms.length
+    : calView === 'blocks' ? (blocks.length + PLAYER_MATCHES.length)
+    : reservations.length;
+}
+document.querySelectorAll('#cal-tabs button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('#cal-tabs button').forEach(function(x){ x.setAttribute('aria-selected','false'); });
+    b.setAttribute('aria-selected','true');
+    calView = b.getAttribute('data-view');
+    renderCalLists();
+  });
+});
+
+document.getElementById('reservation-add').addEventListener('click', function(){
+  document.getElementById('rv-team').value = '';
+  document.getElementById('rv-reason').value = '';
+  sheetOpen('sheet-reservation');
+});
+document.getElementById('rv-save').addEventListener('click', function(){
+  var team = document.getElementById('rv-team').value.trim();
+  var reason = document.getElementById('rv-reason').value.trim();
+  if (!team || !reason) { toast('Fyll ut lag og årsak.'); return; }
+  reservations.push({ team: team, reason: reason });
+  save(LS.reservations, reservations);
+  sheetClose(); renderAll();
+  toast('Reservasjonen er lagt til.');
+});
+
+/* ═══ honorar ═══ */
+function renderInvoice(){
+  var rows = MATCHES.filter(function(m){ return m.status === 'ready'; });
+  document.getElementById('invoice-list').innerHTML = rows.length ? rows.map(function(m){
+    var d = fromIso(m.date);
+    return '<label class="pick"><input type="checkbox" class="inv" data-id="' + m.id + '" data-fee="' + m.fee + '" checked>' +
+      '<span><span class="pt">' + m.home + ' – ' + m.away + '</span>' +
+      '<span class="ps num">' + d.getDate() + '. ' + MONTHS[d.getMonth()] + ' · ' + m.comp + '</span></span>' +
+      '<span class="pright"><span class="chip chip-flat chip-mono">' + m.role + '</span>' +
+      '<span class="pv">' + m.fee + ' kr</span></span></label>';
+  }).join('') : '<p class="empty">Ingen kamper venter på honorarkrav.</p>';
+  document.querySelectorAll('.inv').forEach(function(c){ c.addEventListener('change', sumInvoice); });
+  document.getElementById('invoice-toggle-all').hidden = rows.length === 0;
+  sumInvoice();
+}
+function sumInvoice(){
+  var boxes = document.querySelectorAll('.inv');
+  var checked = 0, t = 0;
+  boxes.forEach(function(c){ if (c.checked){ checked++; t += +c.getAttribute('data-fee'); } });
+  document.getElementById('invoice-total').textContent = t.toLocaleString('nb-NO') + ' kr';
+  document.getElementById('invoice-send').disabled = checked === 0;
+  document.getElementById('invoice-selected').textContent = checked + ' av ' + boxes.length + ' valgt';
+  document.getElementById('invoice-send').textContent = checked > 1
+    ? 'Send ' + checked + ' kamper samlet'
+    : 'Send til idrettsoppgjør';
+  document.getElementById('invoice-toggle-all').textContent = (boxes.length > 0 && checked === boxes.length) ? 'Velg ingen' : 'Velg alle';
+}
+document.getElementById('invoice-toggle-all').addEventListener('click', function(){
+  var boxes = document.querySelectorAll('.inv');
+  var allChecked = Array.prototype.every.call(boxes, function(c){ return c.checked; });
+  boxes.forEach(function(c){ c.checked = !allChecked; });
+  sumInvoice();
+});
+document.getElementById('invoice-send').addEventListener('click', function(){
+  var ids = [];
+  document.querySelectorAll('.inv').forEach(function(c){ if (c.checked) ids.push(c.getAttribute('data-id')); });
+  ids.forEach(function(id){ setStatus(id, 'invoiced'); });
+  renderAll();
+  toast(ids.length > 1
+    ? 'Honorarkravet for ' + ids.length + ' kamper er sendt samlet. Utbetaling 25. november.'
+    : 'Honorarkravet er sendt. Utbetaling 25. november.');
+});
+
+/* ═══ profil ═══ */
+var pSave = document.getElementById('p-save');
+var pFields = ['p-mobil','p-epost','p-reise','p-transport'].map(function(id){ return document.getElementById(id); });
+var pInitial = pFields.map(function(f){ return f.value; });
+function pCheckDirty(){
+  var dirty = pFields.some(function(f, i){ return f.value !== pInitial[i]; });
+  pSave.disabled = !dirty;
+}
+pFields.forEach(function(f){
+  f.addEventListener('input', pCheckDirty);
+  f.addEventListener('change', pCheckDirty);
+});
+pSave.addEventListener('click', function(){
+  toast('Endringene er lagret.');
+  pInitial = pFields.map(function(f){ return f.value; });
+  pSave.disabled = true;
+});
+document.getElementById('bell-btn').addEventListener('click', function(){ sheetOpen('sheet-bell'); });
+
+/* ═══ render ═══ */
+function renderAll(){ renderHome(); renderMatches(); renderCal(); renderBlocks(); renderCalLists(); renderInvoice(); }
+renderAll();
+</script>
+
+
+</body></html>
