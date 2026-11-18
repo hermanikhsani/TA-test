@@ -8,6 +8,7 @@
    The only place raw colour values appear. Everything else is var()/color-mix(). */
 :root{
   --bg:#f7faff;            /* Side-bakgrunn */
+  --stage-bg:#eef0f1;      /* Bakgrunn utenfor telefonen på desktop — nedtonet blå for å fremheve skjermen */
   --surface:#ffffff;       /* Card surface */
   --tone:#e6f0ff;          /* Bakgrunnstone */
   --fg:#001e5f;            /* Primær Blå — tekst og struktur */
@@ -73,8 +74,8 @@ ul{margin:0; padding:0; list-style:none}
 /* ─── stage + device shell ─────────────────────────────────────────── */
 .stage{min-height:100svh; display:grid; place-items:center; padding:var(--s6) var(--s4);
   background:
-    radial-gradient(120% 90% at 50% 0%, var(--tone), transparent 62%),
-    var(--bg);
+    radial-gradient(120% 90% at 50% 0%, color-mix(in oklch, var(--stage-bg) 60%, white), transparent 62%),
+    var(--stage-bg);
 }
 .phone{
   position:relative; width:100%; max-width:430px; height:min(880px,92svh);
